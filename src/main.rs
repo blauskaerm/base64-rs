@@ -6,7 +6,7 @@ const BASE64_MAP: [char; 65] = [
 ];
 const PADDING_SYMBOL: usize = 64;
 
-fn encode_base64_chunk(input_vec: &Vec<u8>) {
+fn base64_encode(input_vec: &Vec<u8>) {
     let chunk_len = input_vec.len();
 
     let (mut an, mut bn, mut cn, mut dn): (usize, usize, usize, usize);
@@ -67,7 +67,7 @@ fn main() {
     let test_string_len = test_string.len();
     println!("Input string ({}): {}", test_string_len, test_string);
     let test_byte_vec = test_string.into_bytes();
-    encode_base64_chunk(&test_byte_vec);
+    base64_encode(&test_byte_vec);
     println!();
 
     // // TWFu
@@ -75,7 +75,7 @@ fn main() {
     // input_vec.push('a' as u8);
     // input_vec.push('n' as u8);
     // print!("Base64: ");
-    // encode_base64_chunk(&input_vec);
+    // base64_encode(&input_vec);
     // println!();
     // input_vec.clear();
 
@@ -83,14 +83,14 @@ fn main() {
     // input_vec.push('M' as u8);
     // input_vec.push('a' as u8);
     // print!("Base64: ");
-    // encode_base64_chunk(&input_vec);
+    // base64_encode(&input_vec);
     // println!();
     // input_vec.clear();
 
     // // TQ==
     // input_vec.push('M' as u8);
     // print!("Base64: ");
-    // encode_base64_chunk(&input_vec);
+    // base64_encode(&input_vec);
     // println!();
     // input_vec.clear();
 
