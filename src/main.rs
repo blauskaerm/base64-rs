@@ -1,4 +1,10 @@
-const BASE64_MAP: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const BASE64_MAP: [char; 65] = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+    'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+    'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4',
+    '5', '6', '7', '8', '9', '+', '/', '=',
+];
+const PADDING_SYMBOL: usize = 64;
 
 fn encode_base64_chunk(input_vec: &Vec<u8>) {
     let chunk_len = input_vec.len();
@@ -22,10 +28,10 @@ fn encode_base64_chunk(input_vec: &Vec<u8>) {
 
         //println!("an: {}, bn: {}, cn: {}, dn: {}", an, bn, cn, dn);
 
-        a = BASE64_MAP.chars().nth(an).unwrap();
-        b = BASE64_MAP.chars().nth(bn).unwrap();
-        c = BASE64_MAP.chars().nth(cn).unwrap();
-        d = BASE64_MAP.chars().nth(dn).unwrap();
+        a = BASE64_MAP[an];
+        b = BASE64_MAP[bn];
+        c = BASE64_MAP[cn];
+        d = BASE64_MAP[dn];
 
         print!("{}{}{}{}", a, b, c, d);
 
@@ -40,10 +46,10 @@ fn encode_base64_chunk(input_vec: &Vec<u8>) {
                                                     //cn = (((input_vec[1] & 0x0F) << 2) | ((input_vec[1] & 0xC0) >> 6)) as usize;
                                                     //dn = (input_vec[2] & 0x3F) as usize;
 
-        a = BASE64_MAP.chars().nth(an).unwrap();
-        b = BASE64_MAP.chars().nth(bn).unwrap();
-        c = '=';
-        d = '=';
+        a = BASE64_MAP[an];
+        b = BASE64_MAP[bn];
+        c = BASE64_MAP[PADDING_SYMBOL];
+        d = BASE64_MAP[PADDING_SYMBOL];
 
         print!("{}{}{}{}", a, b, c, d);
     } else if check_padding == 2 {
@@ -54,10 +60,10 @@ fn encode_base64_chunk(input_vec: &Vec<u8>) {
         cn = ((input_vec[n + 1] & 0x0F) << 2) as usize; //| ((input_vec[1] & 0xC0) >> 6)) as usize;
                                                         // dn = (input_vec[2] & 0x3F) as usize;
 
-        a = BASE64_MAP.chars().nth(an).unwrap();
-        b = BASE64_MAP.chars().nth(bn).unwrap();
-        c = BASE64_MAP.chars().nth(cn).unwrap();
-        d = '=';
+        a = BASE64_MAP[an];
+        b = BASE64_MAP[bn];
+        c = BASE64_MAP[cn];
+        d = BASE64_MAP[PADDING_SYMBOL];
 
         print!("{}{}{}{}", a, b, c, d);
     }
