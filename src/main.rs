@@ -23,7 +23,7 @@ fn encode_base64_chunk(input_vec: &Vec<u8>) {
 
         an = ((input_vec[n] & 0xFC) >> 2) as usize;
         bn = (((input_vec[n] & 0x03) << 4) | ((input_vec[n + 1] & 0xF0) >> 4)) as usize;
-        cn = (((input_vec[n + 1] & 0x0F) << 2) | ((input_vec[n + 1] & 0xC0) >> 6)) as usize;
+        cn = (((input_vec[n + 1] & 0x0F) << 2) | ((input_vec[n + 2] & 0xC0) >> 6)) as usize;
         dn = (input_vec[n + 2] & 0x3F) as usize;
 
         //println!("an: {}, bn: {}, cn: {}, dn: {}", an, bn, cn, dn);
