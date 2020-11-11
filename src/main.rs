@@ -68,18 +68,38 @@ fn base64_encode(input_vec: &Vec<u8>) {
 }
 
 fn base64_decode(input_vec: &Vec<u8>) {
-    let dec_a = BASE64_INV_MAP[(input_vec[0] - BASE64_INV_NORMALIZER) as usize] as u32;
-    let dec_b = BASE64_INV_MAP[(input_vec[1] - BASE64_INV_NORMALIZER) as usize] as u32;
-    let dec_c = BASE64_INV_MAP[(input_vec[2] - BASE64_INV_NORMALIZER) as usize] as u32;
-    let dec_d = BASE64_INV_MAP[(input_vec[3] - BASE64_INV_NORMALIZER) as usize] as u32;
+    let mut n = 0;
+    loop {
+        if (n + 4) > input_vec.len() {
+            break;
+        }
 
-    let decode = (dec_a << 18) | (dec_b << 12) | (dec_c << 6) | dec_d;
+        let dec_a = BASE64_INV_MAP[(input_vec[n] - BASE64_INV_NORMALIZER) as usize] as u32;
+        let dec_b = BASE64_INV_MAP[(input_vec[n + 1] - BASE64_INV_NORMALIZER) as usize] as u32;
+        let mut dec_c = BASE64_INV_MAP[(input_vec[n + 2] - BASE64_INV_NORMALIZER) as usize] as u32;
+        let mut dec_d = BASE64_INV_MAP[(input_vec[n + 3] - BASE64_INV_NORMALIZER) as usize] as u32;
 
-    let a = ((decode >> 16) & 0xFF) as u8;
-    let b = ((decode >> 8) & 0xFF) as u8;
-    let c = (decode & 0xFF) as u8;
+	// Check for padding
+	// Could be single or double padding
+        if input_vec[n + 3] == ('=' as u8) {
+            if input_vec[n + 2] == ('=' as u8) {
+                dec_c = 0;
+                dec_d = 0;
+            } else {
+                dec_d = 0;
+            }
+        }
 
-    print!("{}{}{}", a as char, b as char, c as char);
+        let decode = (dec_a << 18) | (dec_b << 12) | (dec_c << 6) | dec_d;
+
+        let a = ((decode >> 16) & 0xFF) as u8;
+        let b = ((decode >> 8) & 0xFF) as u8;
+        let c = (decode & 0xFF) as u8;
+
+        print!("{}{}{}", a as char, b as char, c as char);
+
+        n = n + 4;
+    }
 }
 
 fn main() {
