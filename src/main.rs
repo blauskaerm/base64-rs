@@ -6,6 +6,16 @@ const BASE64_MAP: [char; 65] = [
 ];
 const PADDING_SYMBOL: usize = 64;
 
+const INVALID: u8 = 255;
+const BASE64_INV_NORMALIZER: u8 = '+' as u8;
+const BASE64_INV_MAP: [u8; 80] = [
+    62, INVALID, INVALID, INVALID, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, INVALID, INVALID,
+    INVALID, INVALID, INVALID, INVALID, INVALID, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, INVALID, INVALID, INVALID, INVALID, INVALID,
+    INVALID, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
+    47, 48, 49, 50, 51,
+];
+
 fn base64_encode(input_vec: &Vec<u8>) {
     let chunk_len = input_vec.len();
 
@@ -58,53 +68,18 @@ fn base64_encode(input_vec: &Vec<u8>) {
 }
 
 fn base64_decode(input_vec: &Vec<u8>) {
-    let mut a: u8;
-    let mut b: u8;
-    let mut c: u8;
-    let mut d: u8;
+    let dec_a = BASE64_INV_MAP[(input_vec[0] - BASE64_INV_NORMALIZER) as usize] as u32;
+    let dec_b = BASE64_INV_MAP[(input_vec[1] - BASE64_INV_NORMALIZER) as usize] as u32;
+    let dec_c = BASE64_INV_MAP[(input_vec[2] - BASE64_INV_NORMALIZER) as usize] as u32;
+    let dec_d = BASE64_INV_MAP[(input_vec[3] - BASE64_INV_NORMALIZER) as usize] as u32;
 
-    // https://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#Decode
-    // https://stackoverflow.com/questions/11559203/decode-table-construction-for-base64
+    let decode = (dec_a << 18) | (dec_b << 12) | (dec_c << 6) | dec_d;
 
-    let mut base64_inv: [u8; 80] = [
-        62, 255, 255, 255, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 255, 255, 255, 255, 255,
-        255, 255, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-        23, 24, 25, 255, 255, 255, 255, 255, 255, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-        38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-    ];
+    let a = ((decode >> 16) & 0xFF) as u8;
+    let b = ((decode >> 8) & 0xFF) as u8;
+    let c = (decode & 0xFF) as u8;
 
-    a = base64_inv[(input_vec[0] - ('+' as u8)) as usize];
-    b = base64_inv[(input_vec[1] - ('+' as u8)) as usize];
-    c = base64_inv[(input_vec[2] - ('+' as u8)) as usize];
-    d = base64_inv[(input_vec[3] - ('+' as u8)) as usize];
-
-    let mut f: u32 = 0;
-
-    f = (((a as u32) << 18) | ((b as u32) << 12) | ((c as u32) << 6) | (d as u32)) as u32;
-
-    let test1 = ((f >> 16) & 0xFF) as u8;
-    let test2 = ((f >> 8) & 0xFF) as u8;
-    let test3 = (f & 0xFF) as u8;
-
-    println!("{}", test1 as char);
-    println!("{}", test2 as char);
-    println!("{} {}", test3 as char, test3);
-
-    println!("{:#010b} {}", input_vec[0], input_vec[0] as char);
-    println!("{:#010b} {}", input_vec[1], input_vec[1] as char);
-    println!("{:#010b} {}", input_vec[2], input_vec[2] as char);
-    println!("{:#010b} {}", input_vec[3], input_vec[3] as char);
-    println!();
-
-    // a = ((input_vec[0] & 0x3F) << 2) | ((input_vec[1] & 0x30) >> 4);
-    //println!("{:#010b} {} {}", a, a, a as char);
-    // println!("{:#010b} {} {}", 77, 77, 77 as char);
-
-    // println!();
-
-    // b = ((input_vec[1] & 0x0F) << 4) | ((input_vec[2] & 0x3C) >> 2);
-    // println!("{:#010b} {} {}", b, b, b as char);
-    // println!("{:#010b} {} {}", 97, 97, 97 as char);
+    print!("{}{}{}", a as char, b as char, c as char);
 }
 
 fn main() {
