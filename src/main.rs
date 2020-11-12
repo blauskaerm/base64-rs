@@ -21,24 +21,28 @@ const BASE64_INV_MAP: [u8; 80] = [
 fn base64_encode(input_vec: &Vec<u8>) {
     let chunk_len = input_vec.len();
 
-    let (mut an, mut bn, mut cn, mut dn): (usize, usize, usize, usize);
     let (mut a, mut b, mut c, mut d): (char, char, char, char);
 
     let mut n = 0;
     loop {
-        if (n + 3) >= chunk_len {
+        if (n + 3) > chunk_len {
             break;
         }
 
-        an = ((input_vec[n] & 0xFC) >> 2) as usize;
-        bn = (((input_vec[n] & 0x03) << 4) | ((input_vec[n + 1] & 0xF0) >> 4)) as usize;
-        cn = (((input_vec[n + 1] & 0x0F) << 2) | ((input_vec[n + 2] & 0xC0) >> 6)) as usize;
-        dn = (input_vec[n + 2] & 0x3F) as usize;
+        let encode = ((input_vec[n] as u32) << 16)
+            | ((input_vec[n + 1] as u32) << 8)
+            | (input_vec[n + 2] as u32);
+        let encode_arr: [usize; 4] = [
+            ((encode >> 18) & 0x3F) as usize,
+            ((encode >> 12) & 0x3F) as usize,
+            ((encode >> 6) & 0x3F) as usize,
+            (encode & 0x3F) as usize,
+        ];
 
-        a = BASE64_MAP[an];
-        b = BASE64_MAP[bn];
-        c = BASE64_MAP[cn];
-        d = BASE64_MAP[dn];
+        a = BASE64_MAP[encode_arr[0]];
+        b = BASE64_MAP[encode_arr[1]];
+        c = BASE64_MAP[encode_arr[2]];
+        d = BASE64_MAP[encode_arr[3]];
 
         print!("{}{}{}{}", a, b, c, d);
 
@@ -46,24 +50,33 @@ fn base64_encode(input_vec: &Vec<u8>) {
     }
     let check_padding = chunk_len - n;
     if check_padding == 1 {
-        an = ((input_vec[n] & 0xFC) >> 2) as usize;
-        bn = ((input_vec[n] & 0x03) << 4) as usize;
+        let encode = (input_vec[n] as u32) << 16;
+        let encode_arr: [usize; 4] = [
+            ((encode >> 18) & 0x3F) as usize,
+            ((encode >> 12) & 0x3F) as usize,
+            PADDING_SYMBOL as usize,
+            PADDING_SYMBOL as usize,
+        ];
 
-        a = BASE64_MAP[an];
-        b = BASE64_MAP[bn];
-        c = BASE64_MAP[PADDING_SYMBOL];
-        d = BASE64_MAP[PADDING_SYMBOL];
+        a = BASE64_MAP[encode_arr[0]];
+        b = BASE64_MAP[encode_arr[1]];
+        c = BASE64_MAP[encode_arr[2]];
+        d = BASE64_MAP[encode_arr[3]];
 
         print!("{}{}{}{}", a, b, c, d);
     } else if check_padding == 2 {
-        an = ((input_vec[n] & 0xFC) >> 2) as usize;
-        bn = (((input_vec[n] & 0x03) << 4) | ((input_vec[n + 1] & 0xF0) >> 4)) as usize;
-        cn = ((input_vec[n + 1] & 0x0F) << 2) as usize;
+        let encode = ((input_vec[n] as u32) << 16) | ((input_vec[n + 1] as u32) << 8);
+        let encode_arr: [usize; 4] = [
+            ((encode >> 18) & 0x3F) as usize,
+            ((encode >> 12) & 0x3F) as usize,
+            ((encode >> 6) & 0x3F) as usize,
+            PADDING_SYMBOL as usize,
+        ];
 
-        a = BASE64_MAP[an];
-        b = BASE64_MAP[bn];
-        c = BASE64_MAP[cn];
-        d = BASE64_MAP[PADDING_SYMBOL];
+        a = BASE64_MAP[encode_arr[0]];
+        b = BASE64_MAP[encode_arr[1]];
+        c = BASE64_MAP[encode_arr[2]];
+        d = BASE64_MAP[encode_arr[3]];
 
         print!("{}{}{}{}", a, b, c, d);
     }
