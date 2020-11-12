@@ -1,3 +1,5 @@
+use std::process;
+
 const BASE64_MAP: [char; 65] = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
     'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -69,8 +71,17 @@ fn base64_encode(input_vec: &Vec<u8>) {
 
 fn base64_decode(input_vec: &Vec<u8>) {
     let mut n = 0;
+
+    let input_vec_len = input_vec.len();
+
+    // Vector should have an even length of four
+    if (input_vec_len % 4) != 0 {
+        eprintln!("Decode vector has invalid length");
+        process::exit(-1);
+    }
+
     loop {
-        if (n + 4) > input_vec.len() {
+        if (n + 4) > input_vec_len {
             break;
         }
 
