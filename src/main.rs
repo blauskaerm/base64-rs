@@ -20,9 +20,20 @@ fn main() {
         .arg(Arg::with_name("decode").short("d").help("Decode data"))
         .get_matches();
 
+    type OperationFnType = fn(&Vec<u8>);
+
     let local_file = matches.value_of("FILE").unwrap();
-    let operation = matches.is_present("decode");
-    println!("Decode: {}", operation);
+    let decode_data = matches.is_present("decode");
+
+    let buffer_size: usize;
+    let operation: OperationFnType;
+    if decode_data {
+        buffer_size = 4 * 1024;
+        operation = base64::base64_decode;
+    } else {
+        buffer_size = 3 * 1024;
+        operation = base64::base64_encode;
+    }
 
     let mut file_fd = match File::open(&local_file) {
         Ok(file) => file,
@@ -35,10 +46,10 @@ fn main() {
             process::exit(-1);
         }
     };
-    let buffer_size: usize = 3 * 1024;
+
     let mut buffer_vec = Vec::with_capacity(buffer_size);
     loop {
-        // Read 3kB from file into buffer_vec and iterate over file
+        // Read buffer_size from file into buffer_vec and iterate over file
         // until the end of file.
         match file_fd
             .by_ref()
@@ -51,8 +62,8 @@ fn main() {
                     break;
                 }
 
-		// Encode buffer
-                base64::base64_encode(&buffer_vec);
+                // Run operation
+                operation(&buffer_vec);
 
                 // Break the loop if the amount of bytes indicates that the
                 // end of file has been reached.
