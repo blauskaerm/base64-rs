@@ -8,22 +8,27 @@ extern crate clap;
 use clap::{App, Arg};
 
 fn main() {
-    let matches = App::new("base64-rs")
+    let cmd_options = App::new("base64-rs")
         .version("0.1")
         .author("BlauskaerM <blauskaerm@protonmail.ch>")
-        .about("Does awesome things")
+        .about("Base64 encode/decode data and print to standard output")
         .arg(
             Arg::with_name("FILE")
                 .help("File to encode/decode, or - to read from stdin")
                 .index(1),
         )
-        .arg(Arg::with_name("decode").short("d").help("Decode data"))
+        .arg(
+            Arg::with_name("decode")
+                .long("decode")
+                .short("d")
+                .help("Decode data"),
+        )
         .get_matches();
 
     type OperationFnType = fn(&Vec<u8>);
 
-    let local_file = matches.value_of("FILE").unwrap();
-    let decode_data = matches.is_present("decode");
+    let local_file = cmd_options.value_of("FILE").unwrap();
+    let decode_data = cmd_options.is_present("decode");
 
     let buffer_size: usize;
     let operation: OperationFnType;
