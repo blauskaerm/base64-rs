@@ -4,16 +4,35 @@ use std::fs::File;
 use std::io::Read;
 use std::process;
 
+extern crate clap;
+use clap::{App, Arg, SubCommand};
+
 fn main() {
-    let local_file = String::from("TestFile.txt");
+    let matches = App::new("base64-rs")
+        .version("0.1")
+        .author("BlauskaerM <blauskaerm@protonmail.ch>")
+        .about("Does awesome things")
+        .arg(
+            Arg::with_name("FILE")
+                .help("File to encode/decode, or - to read from stdin")
+                .index(1),
+        )
+        .arg(Arg::with_name("decode").short("d").help("Decode data"))
+        .get_matches();
+
+    let local_file = matches.value_of("FILE").unwrap();
+    let operation = matches.is_present("decode");
+    println!("Decode: {}", operation);
+
     let mut file_fd = match File::open(&local_file) {
         Ok(file) => file,
         Err(error_description) => {
-            panic!(
+            eprintln!(
                 "Unable to open file {} ({})",
                 local_file,
                 error_description.to_string()
             );
+            process::exit(-1);
         }
     };
     let buffer_size: usize = 3 * 1024;
