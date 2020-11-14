@@ -5,7 +5,7 @@ use std::io::Read;
 use std::process;
 
 extern crate clap;
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg};
 
 fn main() {
     let matches = App::new("base64-rs")
