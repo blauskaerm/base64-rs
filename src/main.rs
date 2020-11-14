@@ -1,21 +1,52 @@
 mod base64;
 
+use std::fs::File;
+use std::io::Read;
+use std::process;
+
 fn main() {
-    // input_vec.push('A' as u8);
-    // input_vec.push('B' as u8);
-    // input_vec.push('C' as u8);
-    let mut input_vec: Vec<u8> = Vec::new();
+    let local_file = String::from("TestFile.txt");
+    let mut file_fd = match File::open(&local_file) {
+        Ok(file) => file,
+        Err(error_description) => {
+            panic!(
+                "Unable to open file {} ({})",
+                local_file,
+                error_description.to_string()
+            );
+        }
+    };
+    let buffer_size: usize = 3 * 1024;
+    let mut buffer_vec = Vec::with_capacity(buffer_size);
+    loop {
+        // Read 3kB from file into buffer_vec and iterate over file
+        // until the end of file.
+        match file_fd
+            .by_ref()
+            .take(buffer_size as u64)
+            .read_to_end(&mut buffer_vec)
+        {
+            Ok(chunk_size) => {
+                // Break loop if the end of file has been reached.
+                if chunk_size == 0 {
+                    break;
+                }
 
-    let test_string = String::from("any carnal pleasure.");
-    let test_encode_byte_vec = test_encode_string.into_bytes();
-    base64::base64_encode(&test_encode_byte_vec);
-    println!();
+		// Encode buffer
+                base64::base64_encode(&buffer_vec);
 
-    input_vec.push('T' as u8);
-    input_vec.push('W' as u8);
-    input_vec.push('F' as u8);
-    input_vec.push('u' as u8);
-    base64_decode(&input_vec);
+                // Break the loop if the amount of bytes indicates that the
+                // end of file has been reached.
+                if chunk_size < buffer_size {
+                    break;
+                }
+
+                // Clear buffer vector
+                buffer_vec.clear();
+            }
+            Err(error_description) => panic!("{}", error_description),
+        }
+    }
     println!();
     input_vec.clear();
 
