@@ -66,7 +66,6 @@ fn main() {
             Err(error_description) => panic!("{}", error_description),
         }
     }
-    println!();
     input_vec.clear();
 
     // // TWFu
