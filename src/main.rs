@@ -24,19 +24,14 @@ fn main() {
         )
         .get_matches();
 
-    type OperationFnType = fn(&Vec<u8>);
-
     let data_src = cmd_options.value_of("FILE").unwrap_or("-");
     let decode_data = cmd_options.is_present("decode");
 
     let buffer_size: usize;
-    let operation: OperationFnType;
     if decode_data {
         buffer_size = 4 * 1024;
-        operation = base64::base64_decode;
     } else {
         buffer_size = 3 * 1024;
-        operation = base64::base64_encode;
     }
 
     // Select stdin as data source or local file
@@ -67,8 +62,13 @@ fn main() {
                     break;
                 }
 
-                // Run operation
-                operation(&buffer_vec);
+                // Run operation. Filter out new line characters if decoding data
+                if decode_data {
+                    buffer_vec.retain(|&c| c != ('\n' as u8));
+                    base64::base64_decode(&buffer_vec);
+                } else {
+                    base64::base64_encode(&buffer_vec);
+                }
 
                 // Break the loop if the amount of bytes indicates that the
                 // end of file has been reached.
