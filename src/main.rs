@@ -1,6 +1,5 @@
 mod base64;
 
-use std::fs::File;
 use std::io::Read;
 use std::process;
 
@@ -27,7 +26,7 @@ fn main() {
 
     type OperationFnType = fn(&Vec<u8>);
 
-    let local_file = cmd_options.value_of("FILE").unwrap();
+    let data_src = cmd_options.value_of("FILE").unwrap_or("-");
     let decode_data = cmd_options.is_present("decode");
 
     let buffer_size: usize;
@@ -40,15 +39,16 @@ fn main() {
         operation = base64::base64_encode;
     }
 
-    let mut file_fd = match File::open(&local_file) {
-        Ok(file) => file,
-        Err(error_description) => {
-            eprintln!(
-                "Unable to open file {} ({})",
-                local_file,
-                error_description.to_string()
-            );
-            process::exit(-1);
+    // Select stdin as data source or local file
+    let mut data_src_fd: Box<dyn std::io::Read + 'static> = if data_src.eq("-") {
+        Box::new(std::io::stdin())
+    } else {
+        match std::fs::File::open(&data_src) {
+            Ok(file) => Box::new(file),
+            Err(err) => {
+                eprintln!("Unable to open file {} ({})", data_src, err.to_string());
+                process::exit(-1);
+            }
         }
     };
 
@@ -56,7 +56,7 @@ fn main() {
     loop {
         // Read buffer_size from file into buffer_vec and iterate over file
         // until the end of file.
-        match file_fd
+        match data_src_fd
             .by_ref()
             .take(buffer_size as u64)
             .read_to_end(&mut buffer_vec)
