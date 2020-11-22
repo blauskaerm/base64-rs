@@ -22,10 +22,20 @@ fn main() {
                 .short("d")
                 .help("Decode data"),
         )
+        .arg(
+            Arg::with_name("WRAP")
+                .short("w")
+                .long("wrap")
+                .value_name("COLS")
+                .help("Wrap encoded lines after COLS characters (default 76)")
+                .takes_value(true),
+        )
         .get_matches();
 
     let data_src = cmd_options.value_of("FILE").unwrap_or("-");
     let decode_data = cmd_options.is_present("decode");
+    let wrap_str = cmd_options.value_of("WRAP").unwrap_or("76");
+    let wrap = wrap_str.parse::<i32>().unwrap();
 
     let buffer_size: usize;
     if decode_data {
@@ -46,6 +56,8 @@ fn main() {
             }
         }
     };
+
+    let mut wrap_guard = 0;
 
     let mut buffer_vec = Vec::with_capacity(buffer_size);
     let mut output_buffer_vec = Vec::new();
@@ -71,6 +83,17 @@ fn main() {
                     if base64::base64_encode(&buffer_vec, &mut output_buffer_vec) == Err(()) {
                         break;
                     }
+
+                    for x in &output_buffer_vec {
+                        if wrap_guard == wrap {
+                            println!();
+                            wrap_guard = 0;
+                        } else {
+                            wrap_guard += 1;
+                        }
+                        print!("{}", *x as char);
+                    }
+
                     output_buffer_vec.clear();
                 }
 
