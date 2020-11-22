@@ -109,34 +109,4 @@ fn main() {
             Err(error_description) => panic!("{}", error_description),
         }
     }
-    input_vec.clear();
-
-    // // TWFu
-    // input_vec.push('M' as u8);
-    // input_vec.push('a' as u8);
-    // input_vec.push('n' as u8);
-    // print!("Base64: ");
-    // base64_encode(&input_vec);
-    // println!();
-    // input_vec.clear();
-
-    // // TWE=
-    // input_vec.push('M' as u8);
-    // input_vec.push('a' as u8);
-    // print!("Base64: ");
-    // base64_encode(&input_vec);
-    // println!();
-    // input_vec.clear();
-
-    // // TQ==
-    // input_vec.push('M' as u8);
-    // print!("Base64: ");
-    // base64_encode(&input_vec);
-    // println!();
-    // input_vec.clear();
-
-    // println!(
-    //     "Input: {}{}{}",
-    //     input_vec[0] as char, input_vec[1] as char, input_vec[2] as char
-    // );
 }
