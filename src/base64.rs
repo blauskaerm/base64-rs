@@ -135,3 +135,43 @@ pub fn base64_decode(input_vec: &Vec<u8>) {
         n = n + 4;
     }
 }
+
+#[cfg(test)]
+mod encode {
+
+    use super::*;
+
+    #[test]
+    fn test_complete_chunk() {
+        let input: Vec<u8> = vec!['M' as u8, 'a' as u8, 'n' as u8];
+        let mut output: Vec<u8> = Vec::new();
+
+        let res = base64_encode(&input, &mut output);
+
+        assert_eq!(res, Ok(()));
+        assert_eq!(output, ['T' as u8, 'W' as u8, 'F' as u8, 'u' as u8]);
+    }
+
+    #[test]
+    fn test_single_padding() {
+        let input: Vec<u8> = vec!['M' as u8, 'a' as u8];
+        let mut output: Vec<u8> = Vec::new();
+
+        let res = base64_encode(&input, &mut output);
+
+        assert_eq!(res, Ok(()));
+        assert_eq!(output, ['T' as u8, 'W' as u8, 'E' as u8, '=' as u8]);
+    }
+
+    #[test]
+    fn test_double_padding() {
+        let input: Vec<u8> = vec!['M' as u8];
+        let mut output: Vec<u8> = Vec::new();
+
+        let res = base64_encode(&input, &mut output);
+
+        assert_eq!(res, Ok(()));
+        assert_eq!(output, ['T' as u8, 'Q' as u8, '=' as u8, '=' as u8]);
+    }
+}
+
