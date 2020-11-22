@@ -48,6 +48,7 @@ fn main() {
     };
 
     let mut buffer_vec = Vec::with_capacity(buffer_size);
+    let mut output_buffer_vec = Vec::new();
     loop {
         // Read buffer_size from file into buffer_vec and iterate over file
         // until the end of file.
@@ -67,7 +68,10 @@ fn main() {
                     buffer_vec.retain(|&c| c != ('\n' as u8));
                     base64::base64_decode(&buffer_vec);
                 } else {
-                    base64::base64_encode(&buffer_vec);
+                    if base64::base64_encode(&buffer_vec, &mut output_buffer_vec) == Err(()) {
+                        break;
+                    }
+                    output_buffer_vec.clear();
                 }
 
                 // Break the loop if the amount of bytes indicates that the

@@ -18,7 +18,7 @@ const BASE64_INV_MAP: [u8; 80] = [
     47, 48, 49, 50, 51,
 ];
 
-pub fn base64_encode(input_vec: &Vec<u8>) {
+pub fn base64_encode(input_vec: &Vec<u8>, output_vec: &mut Vec<u8>) -> Result<(), ()> {
     let input_vector_len = input_vec.len();
 
     let mut n = 0;
@@ -37,13 +37,10 @@ pub fn base64_encode(input_vec: &Vec<u8>) {
             (encode & 0x3F) as usize,
         ];
 
-        print!(
-            "{}{}{}{}",
-            BASE64_MAP[encode_arr[0]],
-            BASE64_MAP[encode_arr[1]],
-            BASE64_MAP[encode_arr[2]],
-            BASE64_MAP[encode_arr[3]]
-        );
+        output_vec.push(BASE64_MAP[encode_arr[0]] as u8);
+        output_vec.push(BASE64_MAP[encode_arr[1]] as u8);
+        output_vec.push(BASE64_MAP[encode_arr[2]] as u8);
+        output_vec.push(BASE64_MAP[encode_arr[3]] as u8);
 
         n = n + 3;
     }
@@ -73,14 +70,12 @@ pub fn base64_encode(input_vec: &Vec<u8>) {
             process::exit(-1);
         }
 
-        print!(
-            "{}{}{}{}",
-            BASE64_MAP[encode_arr[0]],
-            BASE64_MAP[encode_arr[1]],
-            BASE64_MAP[encode_arr[2]],
-            BASE64_MAP[encode_arr[3]]
-        );
+        output_vec.push(BASE64_MAP[encode_arr[0]] as u8);
+        output_vec.push(BASE64_MAP[encode_arr[1]] as u8);
+        output_vec.push(BASE64_MAP[encode_arr[2]] as u8);
+        output_vec.push(BASE64_MAP[encode_arr[3]] as u8);
     }
+    Ok(())
 }
 
 pub fn base64_decode(input_vec: &Vec<u8>) {
