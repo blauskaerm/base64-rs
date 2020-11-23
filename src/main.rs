@@ -78,7 +78,16 @@ fn main() {
                 // Run operation. Filter out new line characters if decoding data
                 if decode_data {
                     buffer_vec.retain(|&c| c != ('\n' as u8));
-                    base64::base64_decode(&buffer_vec);
+                    if base64::base64_decode(&buffer_vec, &mut output_buffer_vec) == Err(()) {
+			break;
+		    }
+
+                    for x in &output_buffer_vec {
+                        print!("{}", *x as char);
+                    }
+
+                    output_buffer_vec.clear();
+
                 } else {
                     if base64::base64_encode(&buffer_vec, &mut output_buffer_vec) == Err(()) {
                         break;

@@ -67,7 +67,7 @@ pub fn base64_encode(input_vec: &Vec<u8>, output_vec: &mut Vec<u8>) -> Result<()
             ];
         } else {
             eprintln!("Invalid padding offset");
-            process::exit(-1);
+            return Err(());
         }
 
         output_vec.push(BASE64_MAP[encode_arr[0]] as u8);
@@ -78,20 +78,20 @@ pub fn base64_encode(input_vec: &Vec<u8>, output_vec: &mut Vec<u8>) -> Result<()
     Ok(())
 }
 
-pub fn base64_decode(input_vec: &Vec<u8>) {
+pub fn base64_decode(input_vec: &Vec<u8>, output_vec: &mut Vec<u8>) -> Result<(), ()> {
     let mut n = 0;
 
     let input_vec_len = input_vec.len();
 
     // Vector should have an even length of four
     if (input_vec_len % 4) != 0 {
-        eprintln!("Decode vector has invalid length");
-        process::exit(-1);
+        eprintln!("Decode vector has invalid length {}", input_vec_len);
+        return Err(());
     }
 
     loop {
         if (n + 4) > input_vec_len {
-            break;
+            return Ok(());
         }
 
         let dec_an = (input_vec[n] - BASE64_INV_NORMALIZER) as usize;
@@ -130,7 +130,9 @@ pub fn base64_decode(input_vec: &Vec<u8>) {
         let b = ((decode >> 8) & 0xFF) as u8;
         let c = (decode & 0xFF) as u8;
 
-        print!("{}{}{}", a as char, b as char, c as char);
+	output_vec.push(a);
+	output_vec.push(b);
+	output_vec.push(c);
 
         n = n + 4;
     }
