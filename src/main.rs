@@ -23,6 +23,12 @@ fn main() {
                 .help("Decode data"),
         )
         .arg(
+            Arg::with_name("ignore-garbage")
+                .long("ignore-garbage")
+                .short("i")
+                .help("When decoding, ignore non-alphabet characters"),
+        )
+        .arg(
             Arg::with_name("WRAP")
                 .short("w")
                 .long("wrap")
@@ -36,6 +42,7 @@ fn main() {
     let decode_data = cmd_options.is_present("decode");
     let wrap_str = cmd_options.value_of("WRAP").unwrap_or("76");
     let wrap = wrap_str.parse::<i32>().unwrap();
+    let ignore_garbage = cmd_options.is_present("ignore-garbage");
 
     let buffer_size: usize;
     if decode_data {
@@ -78,7 +85,8 @@ fn main() {
                 // Run operation. Filter out new line characters if decoding data
                 if decode_data {
                     buffer_vec.retain(|&c| c != ('\n' as u8));
-                    if base64::base64_decode(&buffer_vec, &mut output_buffer_vec) == Err(()) {
+                    if base64::base64_decode(&buffer_vec, &mut output_buffer_vec, ignore_garbage) == Err(()) {
+			eprintln!("Decode garbage");
 			break;
 		    }
 

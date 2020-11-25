@@ -1,5 +1,3 @@
-use std::process;
-
 const BASE64_MAP: [char; 65] = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
     'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -78,7 +76,11 @@ pub fn base64_encode(input_vec: &Vec<u8>, output_vec: &mut Vec<u8>) -> Result<()
     Ok(())
 }
 
-pub fn base64_decode(input_vec: &Vec<u8>, output_vec: &mut Vec<u8>) -> Result<(), ()> {
+pub fn base64_decode(
+    input_vec: &Vec<u8>,
+    output_vec: &mut Vec<u8>,
+    ignore_garbage: bool,
+) -> Result<(), ()> {
     let mut n = 0;
 
     let input_vec_len = input_vec.len();
@@ -104,8 +106,12 @@ pub fn base64_decode(input_vec: &Vec<u8>, output_vec: &mut Vec<u8>) -> Result<()
             || (BASE64_INV_MAP[dec_cn] == INVALID && input_vec[n + 2] != ('=' as u8))
             || (BASE64_INV_MAP[dec_dn] == INVALID && input_vec[n + 3] != ('=' as u8))
         {
-            eprintln!("Decode garbage in chunk {}", n);
-            process::exit(-1);
+            if ignore_garbage {
+                n = n + 4;
+                continue;
+            } else {
+                return Err(());
+            }
         }
 
         let dec_a = BASE64_INV_MAP[dec_an] as u32;
