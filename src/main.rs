@@ -126,4 +126,7 @@ fn main() {
             Err(error_description) => panic!("{}", error_description),
         }
     }
+    if !decode_data {
+        println!();
+    }
 }
