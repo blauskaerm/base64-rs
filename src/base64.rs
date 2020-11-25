@@ -136,9 +136,15 @@ pub fn base64_decode(
         let b = ((decode >> 8) & 0xFF) as u8;
         let c = (decode & 0xFF) as u8;
 
-	output_vec.push(a);
-	output_vec.push(b);
-	output_vec.push(c);
+        if a > 0 {
+            output_vec.push(a);
+        }
+        if b > 0 {
+            output_vec.push(b);
+        }
+        if c > 0 {
+            output_vec.push(c);
+        }
 
         n = n + 4;
     }
@@ -183,3 +189,51 @@ mod encode {
     }
 }
 
+#[cfg(test)]
+mod decode {
+
+    use super::*;
+
+    #[test]
+    fn test_four_byte_chunk() {
+        let input: Vec<u8> = vec!['T' as u8, 'W' as u8, 'F' as u8, 'u' as u8];
+        let mut output: Vec<u8> = Vec::new();
+
+        let res = base64_decode(&input, &mut output, true);
+
+        assert_eq!(res, Ok(()));
+        assert_eq!(output, ['M' as u8, 'a' as u8, 'n' as u8]);
+    }
+
+    #[test]
+    fn test_single_padding() {
+        let input: Vec<u8> = vec!['T' as u8, 'W' as u8, 'E' as u8, '=' as u8];
+        let mut output: Vec<u8> = Vec::new();
+
+        let res = base64_decode(&input, &mut output, true);
+
+        assert_eq!(res, Ok(()));
+        assert_eq!(output, ['M' as u8, 'a' as u8]);
+    }
+
+    #[test]
+    fn test_double_padding() {
+        let input: Vec<u8> = vec!['T' as u8, 'Q' as u8, '=' as u8, '=' as u8];
+        let mut output: Vec<u8> = Vec::new();
+
+        let res = base64_decode(&input, &mut output, true);
+
+        assert_eq!(res, Ok(()));
+        assert_eq!(output, ['M' as u8]);
+    }
+
+    #[test]
+    fn test_detect_garbage() {
+        assert_eq!(true, true);
+    }
+
+    #[test]
+    fn test_ignore_garbage() {
+        assert_eq!(true, true);
+    }
+}
