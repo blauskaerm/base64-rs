@@ -1,6 +1,8 @@
 # Base64-rs
 
-`
+A base64 encoder/decoder written in Rust
+
+```
 Base64 encode/decode data and print to standard output
 
 USAGE:
@@ -17,9 +19,11 @@ OPTIONS:
 
 ARGS:
     <FILE>    File to encode/decode, or - to read from stdin
-`
 
-# Inspiration
+```
+
+## Inspiration
+
 * https://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#Decode
 * https://stackoverflow.com/questions/11559203/decode-table-construction-for-base64
 
